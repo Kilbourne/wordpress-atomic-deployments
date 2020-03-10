@@ -10,6 +10,12 @@ return [
 		'root' => [
 			'.env',
 		],
+		'public/' =>[
+			'.user.ini',
+		],
+		'public/wp/' =>[
+			'wordfence-waf.php'
+		],
 		'public/wp-content/' =>[
 			'languages',
 			'sedlex',
