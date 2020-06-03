@@ -1,22 +1,5 @@
 <?php 
 
-function removeFolderRecursively($path) {
-    $dir = opendir($path);
-    while(false !== ( $file = readdir($dir)) ) {
-        if (( $file != '.' ) && ( $file != '..' )) {
-            $full = $path . '/' . $file;
-            if ( is_dir($full) ) {
-                removeFolderRecursively($full);
-            }
-            else {
-                unlink($full);
-            }
-        }
-    }
-    closedir($dir);
-    rmdir($path);
-}
-
 function execAndMaybeExit($command){
     exec($command, $output, $return);
     if($return !== 0){
@@ -45,11 +28,7 @@ if(isset($options['shared'])){
                 exit(1);
             }
     		if( file_exists($target) ){
-    			if(is_dir($target)){
-    				removeFolderRecursively($target);
-    			}else{
-    				unlink($target);
-    			}
+                execAndMaybeExit("rm -rf $target");
     		}
             execAndMaybeExit("ln -s $src $target");
     	}
