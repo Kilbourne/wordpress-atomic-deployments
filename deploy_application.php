@@ -10,6 +10,8 @@ function execAndMaybeExit($command){
 ob_implicit_flush(1);
 $DEPLOYMENT_ID = time();
 $cwd = getcwd() . DIRECTORY_SEPARATOR;
+echo "Creating: releases/$DEPLOYMENT_ID".PHP_EOL;
+execAndMaybeExit("cp -r deploy_cache/ releases/$DEPLOYMENT_ID");
 if(file_exists(__DIR__.DIRECTORY_SEPARATOR.'releases'. DIRECTORY_SEPARATOR. $DEPLOYMENT_ID . DIRECTORY_SEPARATOR.'deploy_config.php')){
     $options = include(__DIR__.DIRECTORY_SEPARATOR.'releases'. DIRECTORY_SEPARATOR. $DEPLOYMENT_ID . DIRECTORY_SEPARATOR.'deploy_config.php');
     if(!is_array($options)) $options = [];
@@ -17,8 +19,6 @@ if(file_exists(__DIR__.DIRECTORY_SEPARATOR.'releases'. DIRECTORY_SEPARATOR. $DEP
     $options = [];
 }
 $preserve_release = isset($options['preserve_release']) && ($preserve_release = (int) $options['preserve_release']) > 0 ?  $preserve_release : 3;
-echo "Creating: releases/$DEPLOYMENT_ID".PHP_EOL;
-execAndMaybeExit("cp -r deploy_cache/ releases/$DEPLOYMENT_ID");
 
 if(isset($options['shared'])){
     echo "Linking shared to release: $DEPLOYMENT_ID".PHP_EOL;
