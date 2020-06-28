@@ -1,2 +1,8 @@
 /post_activation.php
 /config.php
+/current
+/shared/*
+!/shared/.gitkeep
+/deploy_cache/*
+!/deploy_cache/.gitkeep
+/releases
