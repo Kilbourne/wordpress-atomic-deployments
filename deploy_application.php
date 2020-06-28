@@ -9,16 +9,21 @@ function execAndMaybeExit($command){
 
 ob_implicit_flush(1);
 $DEPLOYMENT_ID = time();
-$options = include(__DIR__.'/config.php') ?: [];
+$cwd = getcwd() . DIRECTORY_SEPARATOR;
+if(file_exists(__DIR__.DIRECTORY_SEPARATOR.'releases'. DIRECTORY_SEPARATOR. $DEPLOYMENT_ID . DIRECTORY_SEPARATOR.'deploy_config.php')){
+    $options = include(__DIR__.DIRECTORY_SEPARATOR.'releases'. DIRECTORY_SEPARATOR. $DEPLOYMENT_ID . DIRECTORY_SEPARATOR.'deploy_config.php');
+    if(!is_array($options)) $options = [];
+}else{
+    $options = [];
+}
 $preserve_release = isset($options['preserve_release']) && ($preserve_release = (int) $options['preserve_release']) > 0 ?  $preserve_release : 3;
-
 echo "Creating: releases/$DEPLOYMENT_ID".PHP_EOL;
 execAndMaybeExit("cp -r deploy_cache/ releases/$DEPLOYMENT_ID");
-echo "Linking shared to release: $DEPLOYMENT_ID".PHP_EOL;
-$cwd = getcwd() . DIRECTORY_SEPARATOR;
-$shared_folder = $cwd . 'shared' . DIRECTORY_SEPARATOR;
-$release_folder = $cwd.'releases'. DIRECTORY_SEPARATOR. $DEPLOYMENT_ID . DIRECTORY_SEPARATOR;
+
 if(isset($options['shared'])){
+    echo "Linking shared to release: $DEPLOYMENT_ID".PHP_EOL;
+    $shared_folder = $cwd . 'shared' . DIRECTORY_SEPARATOR;
+    $release_folder = $cwd.'releases'. DIRECTORY_SEPARATOR. $DEPLOYMENT_ID . DIRECTORY_SEPARATOR;
     foreach ($options['shared'] as $path => $filesArray) {
     	foreach($filesArray as $file){
     		$src = $shared_folder.$file;
@@ -43,7 +48,7 @@ execAndMaybeExit("rm -rf current");
 execAndMaybeExit("ln -s releases/$DEPLOYMENT_ID current");
 echo "Removing old releases".PHP_EOL;
 exec("cd releases && ls -t | tail -n +".(1+$preserve_release)." | xargs rm -rf");
-if(file_exists('post_activation.php')){
+if(file_exists(__DIR__.DIRECTORY_SEPARATOR.'current'. DIRECTORY_SEPARATOR.'deploy_post_activation.php')){
     echo "Post Activation Hook".PHP_EOL;
-    include('post_activation.php');
+    include(__DIR__.DIRECTORY_SEPARATOR.'current'. DIRECTORY_SEPARATOR.'deploy_post_activation.php');
 }
